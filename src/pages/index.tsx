@@ -12,7 +12,7 @@ const IndexPage = () => {
     <div className={roboto_Mono.className}>
       <Head>
         <link rel="shortcut icon" href="/favicon.ico" />
-        <title>Cashscript Playground </title>
+        <title>eScript Playground </title>
       </Head>
       <App/>
     </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Artifact, Contract, ConstructorArgument, NetworkProvider } from 'cashscript'
+import { Artifact, Contract, Argument, NetworkProvider } from 'cashscript'
 import { InputGroup, Form, Button } from 'react-bootstrap'
-import { readAsConstructorType, ContractInfo, TinyContractObj } from './shared'
+import { readAsType, ContractInfo, TinyContractObj } from './shared'
 
 interface Props {
   artifact?: Artifact
@@ -12,7 +12,7 @@ interface Props {
 }
 
 const ContractCreation: React.FC<Props> = ({ artifact, contracts, setContracts, provider, updateUtxosContract}) => {
-  const [constructorArgs, setConstructorArgs] = useState<ConstructorArgument[]>([])
+  const [constructorArgs, setConstructorArgs] = useState<Argument[]>([])
   const [nameContract, setNameContract] = useState<string>("");
   const [createdContract, setCreatedContract] = useState(false);
 
@@ -35,7 +35,7 @@ const ContractCreation: React.FC<Props> = ({ artifact, contracts, setContracts, 
       aria-label={`${input.type} ${input.name}`}
       onChange={(event) => {
         const argsCopy = [...constructorArgs]
-        argsCopy[i] = readAsConstructorType(event.target.value, input.type)
+        argsCopy[i] = readAsType(event.target.value, input.type)
         setConstructorArgs(argsCopy)
       }}
     />
@@ -52,7 +52,7 @@ const ContractCreation: React.FC<Props> = ({ artifact, contracts, setContracts, 
   function createContract() {
     if (!artifact) return
     try {
-      const newContract = new Contract(artifact, constructorArgs, { provider })
+      const newContract = new Contract(artifact, constructorArgs, provider )
       newContract.name = nameContract
       const contractInfo = {contract: newContract, utxos: undefined, args: constructorArgs}
       setContracts([contractInfo, ...contracts ?? []])
@@ -69,12 +69,12 @@ const ContractCreation: React.FC<Props> = ({ artifact, contracts, setContracts, 
     const contractListlocalStorage = contracts.map(contractInfo => {
       const { contract } = contractInfo;
       const strifiedArgs = contractInfo.args.map(arg => 
-        typeof arg == "bigint" ? "bigint"+arg.toString() : arg
+        typeof arg == "number" ? "number"+arg.toString() : arg
       )
       const tinyContractObj: TinyContractObj = {
         contractName: contract.name,
-        artifactName: contract.artifact.contractName,
-        network: contract.provider.network,
+        artifactName: contract['artifact'].contractName,
+        network: contract['provider'].network,
         args: strifiedArgs
       }
       return tinyContractObj

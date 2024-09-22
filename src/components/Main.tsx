@@ -41,17 +41,13 @@ const Main: React.FC<Props> = ({code, setCode, artifacts, setArtifacts, setContr
       const {contractName, artifactName, network, args} = tinyContractObj
       const matchingArtifact = artifacts?.find(artifact => artifact.contractName == artifactName)
       if(!matchingArtifact) return
-      const unstringifiedArgs = args.map(arg => {
-        if(typeof arg == "string" && arg.startsWith("bigint")) return BigInt(arg.slice(6))
-          return arg
-      })
       const provider = new ElectrumNetworkProvider(network)
-      const newContract = new Contract(matchingArtifact, unstringifiedArgs, {provider})
+      const newContract = new Contract(matchingArtifact, args, provider)
       newContract.name = contractName
       const contractInfo: ContractInfo = {
         contract: newContract,
         utxos: undefined,
-        args: unstringifiedArgs
+        args: args
       }
       return contractInfo
     }).filter(item => item != undefined) as ContractInfo[]

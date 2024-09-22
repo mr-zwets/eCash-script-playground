@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Artifact, NetworkProvider, Network, MockNetworkProvider, ElectrumNetworkProvider } from 'cashscript'
+import { Artifact, NetworkProvider, Network, ElectrumNetworkProvider } from 'cashscript'
 import { Form } from 'react-bootstrap'
 import ContractCreation from './ContractCreation';
 import { ContractInfo } from './shared'
@@ -49,9 +49,7 @@ const NewContract: React.FC<Props> = ({ artifacts, provider, setProvider, contra
         changeNetwork(event.target.value as Network)
       }}
     >
-      <option>chipnet</option>
-      <option>testnet3</option>
-      <option>testnet4</option>
+      <option>testnet</option>
       <option>mainnet</option>
     </Form.Control>
   )

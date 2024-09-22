@@ -11,7 +11,7 @@ interface Props {
 }
 
 const ContractFunctions: React.FC<Props> = ({ contractInfo, provider, wallets, updateUtxosContract }) => {
-  const functions = contractInfo.contract.artifact?.abi.map(func => (
+  const functions = contractInfo.contract['artifact']?.abi.map((func: any) => (
     <ContractFunction contractInfo={contractInfo} key={func.name} abi={func} provider={provider} wallets={wallets} updateUtxosContract={updateUtxosContract}/>
   ))
 

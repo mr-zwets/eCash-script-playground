@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { AbiFunction, NetworkProvider, FunctionArgument, Recipient, SignatureTemplate } from 'cashscript'
+import { AbiFunction, NetworkProvider, Argument, Recipient, SignatureTemplate } from 'cashscript'
 import { Form, InputGroup, Button, Card } from 'react-bootstrap'
 import { readAsType, ExplorerString, Wallet, NamedUtxo, ContractInfo } from './shared'
 
@@ -12,13 +12,11 @@ interface Props {
 }
 
 const ContractFunction: React.FC<Props> = ({ contractInfo, abi, provider, wallets, updateUtxosContract }) => {
-  const [functionArgs, setFunctionArgs] = useState<FunctionArgument[]>([])
-  const [outputs, setOutputs] = useState<Recipient[]>([{ to: '', amount: 0n }])
+  const [functionArgs, setFunctionArgs] = useState<Argument[]>([])
+  const [outputs, setOutputs] = useState<Recipient[]>([{ to: '', amount: 0 }])
   // transaction inputs, not the same as abi.inputs
-  const [inputs, setInputs] = useState<NamedUtxo[]>([{ txid: '', vout: 0, satoshis: 0n, name: ``, isP2pkh: false }])
+  const [inputs, setInputs] = useState<NamedUtxo[]>([{ txid: '', vout: 0, satoshis: 0, name: ``, isP2pkh: false }])
   const [manualSelection, setManualSelection] = useState<boolean>(false)
-  const [outputHasFT, setOutputHasFT] = useState<boolean[]>([])
-  const [outputHasNFT, setOutputHasNFT] = useState<boolean[]>([])
   const [noAutomaticChange, setNoAutomaticChange] = useState<boolean>(false)
   const [namedUtxoList, setNamedUtxoList] = useState<NamedUtxo[]>([])
 
@@ -64,7 +62,7 @@ const ContractFunction: React.FC<Props> = ({ contractInfo, abi, provider, wallet
   function selectInput(i: number, inputIndex: string) {
     const inputsCopy = [...inputs];
     // if no input is selected in select form
-    if (isNaN(Number(inputIndex))) inputsCopy[i] = { txid: '', vout: 0, satoshis: 0n, name: ``, isP2pkh: false }
+    if (isNaN(Number(inputIndex))) inputsCopy[i] = { txid: '', vout: 0, satoshis: 0, name: ``, isP2pkh: false }
     else {
       inputsCopy[i] = namedUtxoList[Number(inputIndex)];
     }
@@ -117,90 +115,6 @@ const ContractFunction: React.FC<Props> = ({ contractInfo, abi, provider, wallet
     </div>
   ))
 
-  const tokenFields = (index: number) => (
-    <>
-    <InputGroup key={`output-${index}-tokens`}>
-      <Form.Control size="sm"
-        placeholder="Token Category"
-        aria-label="Token Category"
-        onChange={(event) => {
-          const outputsCopy = [...outputs]
-          const output = outputsCopy[index]
-          const amount = output.token?.amount || 0n
-          const category = event.target.value
-          output.token = {...output.token, amount, category}
-          outputsCopy[index] = output
-          setOutputs(outputsCopy)
-        }}
-      />
-      <Form.Control size="sm"
-        placeholder="Amount Fungible Tokens"
-        aria-label="Amount Fungible Tokens"
-        onChange={(event) => {
-          const outputsCopy = [...outputs]
-          const output = outputsCopy[index]
-          const category = output.token?.category || ""
-          const amount = BigInt(event.target.value)
-          output.token = {...output.token, amount, category}
-          outputsCopy[index] = output
-          setOutputs(outputsCopy)
-        }}
-      />
-    </InputGroup>
-    {outputHasNFT[index] ? (
-        <div>
-          <InputGroup key={`output-${index}-NFT`}>
-            <Form.Control size="sm"
-              placeholder="Token Commitment"
-              aria-label="Token Commitment"
-              onChange={(event) => {
-                const outputsCopy = [...outputs]
-                const output = outputsCopy[index]
-                const capability = output.token?.nft?.capability || "none"
-                const commitment = event.target.value
-                if(!output.token) output.token = {amount: 0n , category:""}
-                output.token.nft = {capability, commitment}
-                outputsCopy[index] = output
-                setOutputs(outputsCopy)
-              }}
-            />
-            <Form.Control size="sm" id="capability-selector"
-              key={`output-${index}-capability-selector`}
-              as="select"
-              onChange={(event) => {
-                const outputsCopy = [...outputs]
-                const output = outputsCopy[index]
-                const commitment = output.token?.nft?.commitment || ""
-                const capability= event.target.value
-                if(capability != "none" && capability != "minting" && capability != "mutable") return
-                if(!output.token) output.token = {amount: 0n , category:""}
-                output.token.nft = {capability, commitment}
-                outputsCopy[index] = output
-                setOutputs(outputsCopy)
-              }}
-            >
-              <option>Select Capability</option>
-              <option value={"none"}>none</option>
-              <option value={"minting"}>minting</option>
-              <option value={"mutable"}>mutable</option>
-            </Form.Control>
-          </InputGroup>
-        </div>)
-        : null}
-    </>
-  )
-  
-  // Set outputHasNFT to false for an output if outputHasFT is false for that output
-  useEffect(() => {
-    outputHasNFT.forEach((hasNFT, index) => {
-      if(hasNFT && !outputHasFT[index]) {
-        const arrayCopy = [...outputHasNFT]
-          arrayCopy[index] = false
-          setOutputHasNFT(arrayCopy)
-      }
-    })
-  }, [outputHasFT])
-
   const outputFields = outputs.map((output, index) => (
     <div  key={`${abi?.name}-output-${index}`}>
       {`Output #${index}`}
@@ -223,46 +137,13 @@ const ContractFunction: React.FC<Props> = ({ contractInfo, abi, provider, wallet
             onChange={(event) => {
               const outputsCopy = [...outputs]
               const output = outputsCopy[index]
-              output.amount = BigInt(event.target.value)
+              output.amount = Number(event.target.value)
               outputsCopy[index] = output
               setOutputs(outputsCopy)
             }}
           />
         </InputGroup>
       </div>
-      <Form style={{ marginTop: '5px', marginBottom: '5px', display: "inline-block" }}>
-      <Form.Check
-          type="switch"
-          id={"outputHasFT" + abi?.name + "index" + index}
-          label="add tokens to output"
-          onChange={() => {
-            const oldValue = outputHasFT[index]
-            const arrayCopy = [...outputHasFT]
-            arrayCopy[index] = !oldValue
-            setOutputHasFT(arrayCopy)
-          }}
-        />
-      </Form>
-      {outputHasFT[index] ? (
-        <Form style={{ marginLeft: '25px', display: "inline-block" }}>
-          <Form.Check
-            type="switch"
-            id={"outputHasNFT" + abi?.name + "index" + index}
-            label="add NFT to output"
-            onChange={() => {
-              const oldValue = outputHasNFT[index]
-              const arrayCopy = [...outputHasNFT]
-              arrayCopy[index] = !oldValue
-              setOutputHasNFT(arrayCopy)
-            }}
-          />
-        </Form>)
-        : null}
-      {outputHasFT[index] ? (
-        <div style={{marginBottom:"10px"}}>
-          {tokenFields(index)}
-        </div>)
-        : null}
     </div>
   ))
 
@@ -281,13 +162,13 @@ const ContractFunction: React.FC<Props> = ({ contractInfo, abi, provider, wallet
         transaction.from(contractInputs)
         p2pkhInputs.forEach(p2pkhInput => {
           if(p2pkhInput !== undefined && p2pkhInput.walletIndex !== undefined){
-            transaction.fromP2PKH(p2pkhInput, new SignatureTemplate(wallets[p2pkhInput.walletIndex].privKey))
+            transaction.experimentalFromP2PKH(p2pkhInput, new SignatureTemplate(wallets[p2pkhInput.walletIndex].privKey))
           }
         })
       }
 
       // if noAutomaticChange is enabled, add this to the transaction in construction
-      if (noAutomaticChange) transaction.withoutChange().withoutTokenChange()
+      if (noAutomaticChange) transaction.withoutChange()
       transaction.to(outputs)
       const { txid } = await transaction.send()
 
@@ -302,7 +183,7 @@ const ContractFunction: React.FC<Props> = ({ contractInfo, abi, provider, wallet
 
   function addOutput() {
     const outputsCopy = [...outputs]
-    outputsCopy.push({ to: '', amount: 0n })
+    outputsCopy.push({ to: '', amount: 0 })
     setOutputs(outputsCopy)
   }
   function removeOutput() {
@@ -313,7 +194,7 @@ const ContractFunction: React.FC<Props> = ({ contractInfo, abi, provider, wallet
 
   function addInput() {
     const inputsCopy = [...inputs]
-    inputsCopy.push({ txid: '', vout: 0, satoshis: 0n, name: ``, isP2pkh: false })
+    inputsCopy.push({ txid: '', vout: 0, satoshis: 0, name: ``, isP2pkh: false })
     setInputs(inputsCopy)
   }
   function removeInput() {

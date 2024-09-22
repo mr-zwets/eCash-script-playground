@@ -44,19 +44,16 @@ const Contracts: React.FC<Props> = ({ contracts, setContracts, updateUtxosContra
           </Card.Header>
           <Card.Body>
             <div style={{ margin: '5px', width: '100%' }}>
-              <strong>Contract address (p2sh32)</strong>
+              <strong>Contract address</strong>
               <CopyText>{contractInfo.contract.address}</CopyText>
-              <strong>Contract token address (p2sh32)</strong>
-              <CopyText>{contractInfo.contract.tokenAddress}</CopyText>
               <strong>Contract artifact</strong>
-              <p>{contractInfo.contract.artifact.contractName}</p>
+              <p>{contractInfo.contract['artifact'].contractName}</p>
               <strong>Contract arguments</strong>
               <details>
                 <summary>Details</summary>
                   <div>
                     {contractInfo.args.map((arg, index) => (<div key={`${contractInfo.contract.name}-arg-${index}`}>
-                        {contractInfo.contract.artifact.constructorInputs[index]?.type} {contractInfo.contract.artifact.constructorInputs[index]?.name + ": "} 
-                        {typeof arg == "bigint" ? arg.toString() : null}
+                        {contractInfo.contract['artifact'].constructorInputs[index]?.type} {contractInfo.contract['artifact'].constructorInputs[index]?.name + ": "} 
                         {typeof arg == "string" || typeof arg == "number" ? arg : null}
                     </div>))}
                   </div>
@@ -81,7 +78,7 @@ const Contracts: React.FC<Props> = ({ contracts, setContracts, updateUtxosContra
               <strong>Total contract balance</strong>
               {contractInfo.utxos == undefined? 
                 <p>loading ...</p>:
-                <p>{contractInfo.utxos?.reduce((acc, utxo) => acc + utxo.satoshis, 0n).toString()} satoshis</p>
+                <p>{contractInfo.utxos?.reduce((acc, utxo) => acc + utxo.satoshis, 0).toString()} satoshis</p>
                 
               }
               <strong>Contract size</strong>

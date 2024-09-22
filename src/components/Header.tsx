@@ -11,7 +11,7 @@ const Header: React.FC<Props> = () => {
       width: "fit-content",
       fontSize: '30px'
     }}>
-      <div className="header-title">CashScript Playground</div>
+      <div className="header-title">eScript Playground</div>
     </header>
   )
 }

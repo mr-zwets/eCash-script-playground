@@ -15,7 +15,7 @@ const Footer: React.FC = () => {
           color: '#fff',
           background: 'black'
       }}>
-        <a href="https://cashscript.org" target="_blank" rel="noopener noreferrer">cashscript.org</a>
+        <a>test ecash script</a>
       </div>
     </footer>
   )

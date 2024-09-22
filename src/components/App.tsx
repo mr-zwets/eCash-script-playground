@@ -13,12 +13,13 @@ import Contracts from './Contracts';
 import TransactionBuilder from './TransactionBuilder';
 
 function App() {
-  const [provider, setProvider] = useState<NetworkProvider>(new ElectrumNetworkProvider("chipnet"))
+  const [provider, setProvider] = useState<NetworkProvider>(new ElectrumNetworkProvider("testnet"))
   const [wallets, setWallets] = useState<Wallet[]>([])
   const [artifacts, setArtifacts] = useState<Artifact[] | undefined>(undefined);
   const [contracts, setContracts] = useState<ContractInfo[] | undefined>(undefined)
   const [code, setCode] = useState<string>(
-`pragma cashscript >= 0.10.0;
+`pragma cashscript ^0.6.5;
+// language version before BCH-specific upgrades
     
 contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {
     // Require recipient's signature to match
