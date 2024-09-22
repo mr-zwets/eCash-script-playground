@@ -21,17 +21,19 @@ function App() {
 `pragma cashscript ^0.6.5;
 // language version before BCH-specific upgrades
     
-contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {
-    // Require recipient's signature to match
-    function transfer(sig recipientSig) {
-        require(checkSig(recipientSig, recipient));
-    }
-    
-    // Require timeout time to be reached and sender's signature to match
-    function timeout(sig senderSig) {
-        require(checkSig(senderSig, sender));
-        require(tx.time >= timeout);
-    }
+contract Escrow(bytes20 arbiter, bytes20 buyer, bytes20 seller) {
+  function spend(pubkey pk, sig s) {
+    // required for pre-image introspection 
+    require(hash160(pk) == arbiter);
+    require(checkSig(s, pk));
+
+    // Create and enforce outputs
+    int minerFee = 1000; // hardcoded fee
+    bytes8 amount = bytes8(int(bytes(tx.value)) - minerFee);
+    bytes34 buyerOutput = new OutputP2PKH(amount, buyer);
+    bytes34 sellerOutput = new OutputP2PKH(amount, seller);
+    require(tx.hashOutputs == hash256(buyerOutput) || tx.hashOutputs == hash256(sellerOutput));
+  }
 }
 `);
 
