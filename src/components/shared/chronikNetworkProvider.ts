@@ -1,7 +1,7 @@
 import { binToHex, decodeCashAddress } from "@bitauth/libauth";
 import { Network, NetworkProvider, Utxo } from "cashscript";
 import { ChronikClientNode } from 'chronik-client';
-const chronik = new ChronikClientNode("https://chronik.pay2stay.com/xec");
+const chronik = new ChronikClientNode(["https://chronik.pay2stay.com/xec"]);
 
 export default class ChronikNetworkProvider implements NetworkProvider {
   constructor(
