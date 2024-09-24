@@ -1,6 +1,6 @@
 // Components
 import React, { useState } from 'react';
-import { Artifact, ElectrumNetworkProvider, NetworkProvider } from 'cashscript';
+import { Artifact, NetworkProvider } from 'cashscript';
 import Header from './Header'
 import Main from './Main'
 import Footer from './Footer';
@@ -11,9 +11,11 @@ import { Wallet, ContractInfo } from './shared';
 import NewContract from './NewContract';
 import Contracts from './Contracts';
 import TransactionBuilder from './TransactionBuilder';
+import ChronikNetworkProvider from './shared/chronikNetworkProvider';
 
 function App() {
-  const [provider, setProvider] = useState<NetworkProvider>(new ElectrumNetworkProvider("testnet"))
+  const mainnetChronik = new ChronikNetworkProvider()
+  const [provider, setProvider] = useState<NetworkProvider>(mainnetChronik)
   const [wallets, setWallets] = useState<Wallet[]>([])
   const [artifacts, setArtifacts] = useState<Artifact[] | undefined>(undefined);
   const [contracts, setContracts] = useState<ContractInfo[] | undefined>(undefined)

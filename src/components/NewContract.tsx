@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Artifact, NetworkProvider, Network, ElectrumNetworkProvider } from 'cashscript'
+import { Artifact, NetworkProvider, Network } from 'cashscript'
 import { Form } from 'react-bootstrap'
 import ContractCreation from './ContractCreation';
 import { ContractInfo } from './shared'
+import ChronikNetworkProvider from './shared/chronikNetworkProvider';
 
 interface Props {
   artifacts?: Artifact[]
@@ -37,7 +38,7 @@ const NewContract: React.FC<Props> = ({ artifacts, provider, setProvider, contra
   )
 
   function changeNetwork(newNetwork: Network){
-    const newprovider = new ElectrumNetworkProvider(newNetwork)
+    const newprovider = new ChronikNetworkProvider()
     setProvider(newprovider)
   }
 
@@ -49,7 +50,6 @@ const NewContract: React.FC<Props> = ({ artifacts, provider, setProvider, contra
         changeNetwork(event.target.value as Network)
       }}
     >
-      <option>testnet</option>
       <option>mainnet</option>
     </Form.Control>
   )

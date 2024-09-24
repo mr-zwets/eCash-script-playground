@@ -4,6 +4,7 @@ import { compileString } from 'cashc';
 import { RowFlex, ContractInfo, TinyContractObj } from './shared';
 import Editor from './Editor';
 import ArtifactsInfo from './ArtifactsInfo';
+import ChronikNetworkProvider from './shared/chronikNetworkProvider';
 
 interface Props {
   code: string
@@ -41,7 +42,7 @@ const Main: React.FC<Props> = ({code, setCode, artifacts, setArtifacts, setContr
       const {contractName, artifactName, network, args} = tinyContractObj
       const matchingArtifact = artifacts?.find(artifact => artifact.contractName == artifactName)
       if(!matchingArtifact) return
-      const provider = new ElectrumNetworkProvider(network)
+      const provider = new ChronikNetworkProvider()
       const newContract = new Contract(matchingArtifact, args, provider)
       newContract.name = contractName
       const contractInfo: ContractInfo = {
